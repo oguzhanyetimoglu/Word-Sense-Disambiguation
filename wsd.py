@@ -1,3 +1,4 @@
+# edit deneme 
 from bs4 import BeautifulSoup
 
 with open("wordnet.xml") as wordnet:
