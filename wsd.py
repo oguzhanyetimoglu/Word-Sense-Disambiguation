@@ -3,10 +3,10 @@ from bs4 import BeautifulSoup
 with open("wordnet.xml") as wordnet:
 	soup = BeautifulSoup(wordnet, "html.parser")
 
-idToWordsDict = {}   # synset id'si ile o id'ye ait kelimeler listesi
+idToWordsDict = {}      # Dictionary: Key -> sysnet id,  Value -> List of words in that sysnet
 # Hypernymler eklenecek
 # Tanımlar eklenecek
-wordToSensesDict = {}
+wordToSensesDict = {}   # Dictionary: Key -> word, Value -> List of sense ids for that word
 
 
 synsets = soup.find_all("synset")
@@ -15,7 +15,9 @@ for synset in synsets:
 	literals = synset.find_all("literal")
 	words = []
 	for literal in literals:
-		word = str(literal)[9:-26]   # Buna başka bi çözüm bulmak lazım çünkü olmak< falan geliyo
+		# Buna başka bi çözüm bulmak lazım çünkü 'olmak<' diye token geliyo mesela
+		# sense tagleri arasındaki sayı çift basamaklı olduğu zaman.
+		word = str(literal)[9:-26]   
 		words.append(word)
 		if word not in wordToSensesDict:
 			wordToSensesDict[word] = [synsetId]
@@ -31,9 +33,10 @@ sentence = "yaz gelmek bahar kış"
 
 tokens = sentence.split()
 target = "yaz"  
-# Wordnete bunu hem yaz hem yazmak olarak sokmamız lazım
-# Burda zemberek falan şart
-# Olmayan kelimeler için kontrol şart
+
+# Wordnete bunu hem yaz hem yazmak olarak sokmamız lazım çünkü wordnette yaz'ın fiil hali yok
+# Burda zemberek falan kullanılacak
+# Wordnette olmayan kelimeler için bi if kontrolü lazım yoksa program patlar
 
 def calculate_scores(targetBags, bigBag):
 	
@@ -43,8 +46,8 @@ def disambiguate(tokens, target):
 	candidates = candidates + wordToSensesDict[target + "mak"]
 	#print(candidates)
 	scoresDict = {}
-	targetBags = []
-	bigBag = []
+	targetBags = []  # Target word'ümüzün tüm senselerinin bagleri
+	bigBag = []      # Diğer her şeyin istiflendiği bag
 	for senseId in candidates:
 		bag = []
 		synset = idToWordsDict[senseId]
@@ -64,9 +67,6 @@ def disambiguate(tokens, target):
 	print(bigBag)
 	print(targetBags)
 	scores = calculate_scores(targetBags, bigBag)
-
-
-
 
 
 disambiguate(tokens, target)
