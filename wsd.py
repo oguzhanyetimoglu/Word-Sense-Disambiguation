@@ -1,11 +1,12 @@
 from bs4 import BeautifulSoup
+import re
 
-with open("wordnet.xml") as wordnet:
+with open("wordnet.xml", 'rb') as wordnet:
 	soup = BeautifulSoup(wordnet, "html.parser")
 
 idToWordsDict = {}      # Dictionary: Key -> sysnet id,  Value -> List of words in that sysnet
-# Hypernymler eklenecek
-# Tanımlar eklenecek
+# TODO: Hypernymler eklenecek
+# TODO: Tanımlar eklenecek
 wordToSensesDict = {}   # Dictionary: Key -> word, Value -> List of sense ids for that word
 
 
@@ -15,14 +16,18 @@ for synset in synsets:
 	literals = synset.find_all("literal")
 	words = []
 	for literal in literals:
-		# Buna başka bi çözüm bulmak lazım çünkü 'olmak<' diye token geliyo mesela
+		# TODO: Buna başka bi çözüm bulmak lazım çünkü 'olmak<' diye token geliyo mesela
 		# sense tagleri arasındaki sayı çift basamaklı olduğu zaman.
-		word = str(literal)[9:-26]   
-		words.append(word)
-		if word not in wordToSensesDict:
-			wordToSensesDict[word] = [synsetId]
-		else:
-			wordToSensesDict[word].append(synsetId)
+		word = re.findall(r'<literal>(.*?)<sense>',str(literal))
+
+		if word:
+			word = word[0]
+			words.append(word)
+			if word not in wordToSensesDict:
+				wordToSensesDict[word] = [synsetId]
+			else:
+				wordToSensesDict[word].append(synsetId)
+
 	#print(str(words))
 	idToWordsDict[synsetId] = words
 
@@ -34,12 +39,12 @@ sentence = "yaz gelmek bahar kış"
 tokens = sentence.split()
 target = "yaz"  
 
-# Wordnete bunu hem yaz hem yazmak olarak sokmamız lazım çünkü wordnette yaz'ın fiil hali yok
-# Burda zemberek falan kullanılacak
-# Wordnette olmayan kelimeler için bi if kontrolü lazım yoksa program patlar
+# TODO: Wordnete bunu hem yaz hem yazmak olarak sokmamız lazım çünkü wordnette yaz'ın fiil hali yok
+# TODO: Burda zemberek falan kullanılacak
+# TODO: Wordnette olmayan kelimeler için bi if kontrolü lazım yoksa program patlar
 
 def calculate_scores(targetBags, bigBag):
-	
+	pass
 
 def disambiguate(tokens, target):
 	candidates = wordToSensesDict[target]
@@ -71,8 +76,3 @@ def disambiguate(tokens, target):
 
 disambiguate(tokens, target)
 
-
-
-
-
-	
