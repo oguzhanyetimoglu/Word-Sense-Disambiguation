@@ -16,8 +16,6 @@ for synset in synsets:
 	literals = synset.find_all("literal")
 	words = []
 	for literal in literals:
-		# TODO: Buna başka bi çözüm bulmak lazım çünkü 'olmak<' diye token geliyo mesela
-		# sense tagleri arasındaki sayı çift basamaklı olduğu zaman.
 		word = re.findall(r'<literal>(.*?)<sense>',str(literal))
 
 		if word:
